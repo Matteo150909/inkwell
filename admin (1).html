@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inkwell — Administration</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+:root{--acc:#b8722a;--dng:#c0392b;--ok:#27ae60;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:#0f0e0c;color:#e8e4db;min-height:100vh;}
+#loginPage{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem;position:relative;overflow:hidden;}
+.lbg{position:absolute;font-family:'Cormorant Garamond',serif;font-size:40vw;font-weight:300;font-style:italic;color:rgba(184,114,42,.04);right:-5vw;top:-5vw;line-height:1;pointer-events:none;}
+.lcard{background:#1a1815;border:1px solid rgba(232,228,219,.08);border-radius:8px;padding:3rem;width:100%;max-width:420px;position:relative;z-index:1;}
+.llogo{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:600;color:#e8e4db;margin-bottom:.2rem;}
+.llogo span{color:var(--acc);}
+.lsub{font-size:.7rem;color:rgba(232,228,219,.28);letter-spacing:.12em;text-transform:uppercase;margin-bottom:2.5rem;}
+.lg{margin-bottom:1.2rem;}
+.lg label{display:block;font-size:.67rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(232,228,219,.32);margin-bottom:.42rem;}
+.lg input{width:100%;background:#252220;border:1px solid rgba(232,228,219,.1);border-radius:3px;padding:.82rem 1rem;font-size:.9rem;font-family:'DM Sans',sans-serif;color:#e8e4db;outline:none;transition:border-color .2s;}
+.lg input:focus{border-color:rgba(184,114,42,.5);}
+.lg input::placeholder{color:rgba(232,228,219,.18);}
+.lbtn{width:100%;background:var(--acc);color:#fff;border:none;border-radius:3px;padding:1rem;font-size:.82rem;font-family:'DM Sans',sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;margin-top:.3rem;}
+.lbtn:hover{opacity:.85;}
+.lerr{background:rgba(192,57,43,.12);border:1px solid rgba(192,57,43,.22);border-radius:3px;padding:.65rem 1rem;margin-top:.8rem;font-size:.78rem;color:#e05c5c;display:none;}
+.lerr.show{display:block;}
+.lfoot{text-align:center;margin-top:2rem;font-size:.68rem;color:rgba(232,228,219,.16);}
+#adminPage{display:none;min-height:100vh;}
+.layout{display:flex;min-height:100vh;}
+.sb{width:240px;flex-shrink:0;background:#1a1815;border-right:1px solid rgba(232,228,219,.06);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:transform .3s;}
+.sb-logo{padding:1.5rem 1.5rem 1rem;font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;color:#e8e4db;border-bottom:1px solid rgba(232,228,219,.06);}
+.sb-logo span{color:var(--acc);}
+.sb-logo small{display:block;font-size:.58rem;font-family:'DM Sans',sans-serif;font-weight:300;color:rgba(232,228,219,.25);letter-spacing:.1em;text-transform:uppercase;margin-top:.2rem;}
+.sb-user{padding:1rem 1.5rem;border-bottom:1px solid rgba(232,228,219,.06);display:flex;align-items:center;gap:.8rem;}
+.av{width:34px;height:34px;border-radius:50%;background:var(--acc);display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:500;color:#fff;flex-shrink:0;}
+.uname{font-size:.82rem;color:#e8e4db;}
+.urole{font-size:.6rem;color:rgba(232,228,219,.28);text-transform:uppercase;letter-spacing:.08em;}
+.sb-nav{flex:1;padding:1rem 0;overflow-y:auto;}
+.sb-sec{font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(232,228,219,.2);padding:.45rem 1.5rem;margin-top:.4rem;}
+.sl{display:flex;align-items:center;gap:.8rem;padding:.62rem 1.5rem;font-size:.82rem;color:rgba(232,228,219,.45);cursor:pointer;transition:all .2s;border-left:2px solid transparent;}
+.sl:hover{color:rgba(232,228,219,.8);background:rgba(232,228,219,.03);}
+.sl.active{color:var(--acc);background:rgba(184,114,42,.07);border-left-color:var(--acc);}
+.sl .ico{font-size:.92rem;width:20px;text-align:center;}
+.sb-bot{padding:1rem 1.5rem;border-top:1px solid rgba(232,228,219,.06);}
+.back-lnk{display:block;text-align:center;font-size:.68rem;color:rgba(232,228,219,.22);margin-bottom:.7rem;text-decoration:none;letter-spacing:.05em;transition:color .2s;}
+.back-lnk:hover{color:var(--acc);}
+.lo-btn{width:100%;background:transparent;border:1px solid rgba(232,228,219,.1);border-radius:3px;padding:.48rem;font-size:.7rem;color:rgba(232,228,219,.35);cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:.06em;text-transform:uppercase;transition:all .2s;}
+.lo-btn:hover{border-color:#e05c5c;color:#e05c5c;}
+.main{margin-left:240px;padding:2rem;flex:1;}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;}
+.topbar h1{font-family:'Cormorant Garamond',serif;font-size:1.75rem;font-weight:300;color:#e8e4db;}
+.trole{background:rgba(184,114,42,.13);color:var(--acc);font-size:.65rem;padding:.2rem .62rem;border-radius:100px;letter-spacing:.08em;text-transform:uppercase;}
+.panel{display:none;}
+.panel.active{display:block;}
+.srow{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:1rem;margin-bottom:1.8rem;}
+.sc{background:#1a1815;border:1px solid rgba(232,228,219,.06);border-radius:6px;padding:1.2rem;}
+.sc-n{font-family:'Cormorant Garamond',serif;font-size:2.1rem;font-weight:300;color:var(--acc);line-height:1;}
+.sc-l{font-size:.68rem;color:rgba(232,228,219,.3);text-transform:uppercase;letter-spacing:.08em;margin-top:.22rem;}
+.sc-s{font-size:.7rem;color:rgba(232,228,219,.22);margin-top:.12rem;}
+.tw{background:#1a1815;border:1px solid rgba(232,228,219,.06);border-radius:6px;overflow:hidden;margin-bottom:1.5rem;}
+.th2{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;border-bottom:1px solid rgba(232,228,219,.06);}
+.th2 h3{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:400;color:#e8e4db;}
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;font-size:.63rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(232,228,219,.26);padding:.65rem 1.5rem;border-bottom:1px solid rgba(232,228,219,.06);}
+td{padding:.75rem 1.5rem;font-size:.8rem;color:rgba(232,228,219,.62);border-bottom:1px solid rgba(232,228,219,.04);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(232,228,219,.018);}
+.pill{display:inline-flex;align-items:center;font-size:.62rem;padding:.16rem .52rem;border-radius:100px;letter-spacing:.06em;text-transform:uppercase;}
+.pa{background:rgba(184,114,42,.13);color:var(--acc);}
+.pf{background:rgba(122,113,102,.11);color:rgba(232,228,219,.35);}
+.po{background:rgba(39,174,96,.11);color:#5aad7a;}
+.pi{background:rgba(192,57,43,.1);color:#e05c5c;}
+.abtn{background:transparent;border:1px solid rgba(232,228,219,.11);border-radius:3px;padding:.26rem .62rem;font-size:.67rem;color:rgba(232,228,219,.42);cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.abtn:hover{border-color:var(--acc);color:var(--acc);}
+.abtn.d:hover{border-color:#e05c5c;color:#e05c5c;}
+.sbtn{background:var(--acc);color:#fff;border:none;border-radius:3px;padding:.68rem 1.3rem;font-size:.74rem;font-family:'DM Sans',sans-serif;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;}
+.sbtn:hover{opacity:.85;}
+.sbtn.sec{background:rgba(232,228,219,.07);color:rgba(232,228,219,.48);}
+.sbtn.sec:hover{background:rgba(232,228,219,.11);}
+.sbtn.red{background:rgba(192,57,43,.17);color:#e05c5c;}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+.scard{background:#1a1815;border:1px solid rgba(232,228,219,.06);border-radius:6px;padding:1.5rem;}
+.scard h3{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:400;color:#e8e4db;margin-bottom:1.1rem;}
+.sg2{margin-bottom:.95rem;}
+.sg2 label{display:block;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(232,228,219,.3);margin-bottom:.38rem;}
+.sg2 input,.sg2 select,.sg2 textarea{width:100%;background:#252220;border:1px solid rgba(232,228,219,.1);border-radius:3px;padding:.62rem .9rem;font-size:.83rem;font-family:'DM Sans',sans-serif;color:#e8e4db;outline:none;transition:border-color .2s;}
+.sg2 input:focus,.sg2 select:focus{border-color:rgba(184,114,42,.4);}
+.trow{display:flex;align-items:center;justify-content:space-between;padding:.68rem 0;border-bottom:1px solid rgba(232,228,219,.04);}
+.trow:last-child{border-bottom:none;}
+.tl{font-size:.82rem;color:rgba(232,228,219,.6);}
+.ts{font-size:.68rem;color:rgba(232,228,219,.25);margin-top:.1rem;}
+.sw{position:relative;width:36px;height:20px;flex-shrink:0;}
+.sw input{opacity:0;width:0;height:0;position:absolute;}
+.swt{position:absolute;inset:0;background:rgba(232,228,219,.1);border-radius:100px;cursor:pointer;transition:background .2s;}
+.sw input:checked+.swt{background:var(--acc);}
+.swt::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform .2s;}
+.sw input:checked+.swt::after{transform:translateX(16px);}
+.al{background:#1a1815;border:1px solid rgba(232,228,219,.06);border-radius:6px;overflow:hidden;}
+.ai{display:flex;align-items:start;gap:1rem;padding:.95rem 1.5rem;border-bottom:1px solid rgba(232,228,219,.04);}
+.ai:last-child{border-bottom:none;}
+.ad{width:7px;height:7px;border-radius:50%;background:var(--acc);flex-shrink:0;margin-top:.32rem;}
+.ad.w{background:#e8c445;}
+.ad.d{background:#e05c5c;}
+.at{font-size:.78rem;color:rgba(232,228,219,.62);}
+.atime{font-size:.66rem;color:rgba(232,228,219,.2);margin-top:.1rem;}
+.pw{background:#1a1815;border:1px solid rgba(232,228,219,.06);border-radius:6px;overflow:hidden;margin-bottom:1.5rem;}
+.pb{display:flex;align-items:center;gap:.5rem;padding:.62rem 1rem;background:#111009;border-bottom:1px solid rgba(232,228,219,.06);}
+.pd{width:10px;height:10px;border-radius:50%;}
+.pu{flex:1;background:rgba(232,228,219,.05);border-radius:3px;padding:.26rem .72rem;font-size:.7rem;color:rgba(232,228,219,.35);}
+.pi2{padding:1.2rem 1.5rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.pil{font-size:.66rem;color:rgba(232,228,219,.26);}
+.piv{font-size:.83rem;color:rgba(232,228,219,.62);margin-top:.14rem;}
+.mov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:600;align-items:center;justify-content:center;}
+.mov.open{display:flex;}
+.mbox{background:#1a1815;border:1px solid rgba(232,228,219,.1);border-radius:8px;padding:2rem;max-width:430px;width:100%;margin:1rem;}
+.mt{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:300;color:#e8e4db;margin-bottom:1.4rem;display:flex;justify-content:space-between;align-items:center;}
+.mc{background:transparent;border:none;color:rgba(232,228,219,.28);font-size:1.2rem;cursor:pointer;}
+.mc:hover{color:#e8e4db;}
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:#1a1815;border:1px solid rgba(184,114,42,.25);border-radius:6px;padding:.78rem 1.1rem;font-size:.78rem;color:#e8e4db;opacity:0;transform:translateY(6px);transition:all .3s;pointer-events:none;z-index:900;}
+.toast.show{opacity:1;transform:none;}
+.toast.ok{border-color:rgba(39,174,96,.25);}
+.toast.err{border-color:rgba(192,57,43,.25);}
+.mob-btn{display:none;background:none;border:none;color:rgba(232,228,219,.55);font-size:1.2rem;cursor:pointer;padding:.3rem;}
+@media(max-width:768px){
+  .mob-btn{display:block;}
+  .sb{transform:translateX(-100%);}
+  .sb.open{transform:none;}
+  .main{margin-left:0;padding:1.2rem;}
+  .sgrid{grid-template-columns:1fr;}
+  .srow{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<div id="loginPage">
+  <div class="lbg">"</div>
+  <div class="lcard">
+    <div class="llogo">Ink<span>well</span></div>
+    <div class="lsub">Espace administration</div>
+    <div class="lg"><label>Adresse e-mail</label><input type="email" id="lE" placeholder="ton@email.com" onkeydown="if(event.key==='Enter')login()"></div>
+    <div class="lg"><label>Mot de passe</label><input type="password" id="lP" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()"></div>
+    <button class="lbtn" onclick="login()">Se connecter →</button>
+    <div class="lerr" id="lErr">Email ou mot de passe incorrect.</div>
+    <div class="lfoot">Inkwell Admin · Accès réservé</div>
+  </div>
+</div>
+
+<div id="adminPage">
+  <div class="layout">
+    <div class="sb" id="sb">
+      <div class="sb-logo">Ink<span>well</span><small>Administration</small></div>
+      <div class="sb-user"><div class="av" id="uAv">M</div><div><div class="uname" id="uNm">Matteo</div><div class="urole">Super Admin</div></div></div>
+      <nav class="sb-nav">
+        <div class="sb-sec">Principal</div>
+        <div class="sl active" onclick="go('dash',this)"><span class="ico">◈</span> Tableau de bord</div>
+        <div class="sl" onclick="go('users',this)"><span class="ico">👥</span> Utilisateurs</div>
+        <div class="sl" onclick="go('site',this)"><span class="ico">◎</span> Gestion du site</div>
+        <div class="sb-sec">Contenu</div>
+        <div class="sl" onclick="go('pages',this)"><span class="ico">📄</span> Pages</div>
+        <div class="sl" onclick="go('stats',this)"><span class="ico">✦</span> Statistiques</div>
+        <div class="sb-sec">Système</div>
+        <div class="sl" onclick="go('settings',this)"><span class="ico">⚙</span> Paramètres</div>
+        <div class="sl" onclick="go('activity',this)"><span class="ico">◇</span> Activité</div>
+      </nav>
+      <div class="sb-bot">
+        <a class="back-lnk" href="javascript:void(0)" onclick="window.open('index.html')">← Retour au site</a>
+        <button class="lo-btn" onclick="logout()">Se déconnecter</button>
+      </div>
+    </div>
+
+    <main class="main">
+      <div class="topbar">
+        <div style="display:flex;align-items:center;gap:1rem">
+          <button class="mob-btn" onclick="document.getElementById('sb').classList.toggle('open')">☰</button>
+          <h1 id="pTitle">Tableau de bord</h1>
+        </div>
+        <span class="trole" id="tRole">Super Admin</span>
+      </div>
+
+      <div class="panel active" id="p-dash">
+        <div class="srow">
+          <div class="sc"><div class="sc-n" id="s-u">2</div><div class="sc-l">Utilisateurs</div><div class="sc-s">2 super admins</div></div>
+          <div class="sc"><div class="sc-n">9</div><div class="sc-l">Pages actives</div><div class="sc-s">Toutes en ligne</div></div>
+          <div class="sc"><div class="sc-n">v15</div><div class="sc-l">Version</div><div class="sc-s">Inkwell</div></div>
+          <div class="sc"><div class="sc-n">🟢</div><div class="sc-l">Statut</div><div class="sc-s">Site en ligne</div></div>
+        </div>
+        <div class="tw">
+          <div class="th2"><h3>Admins</h3><button class="abtn" onclick="openM()">+ Ajouter</button></div>
+          <table><thead><tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Statut</th><th>Action</th></tr></thead><tbody id="dUsers"></tbody></table>
+        </div>
+        <div class="al" id="dAct"></div>
+      </div>
+
+      <div class="panel" id="p-users">
+        <div class="tw">
+          <div class="th2"><h3>Tous les utilisateurs</h3><button class="abtn" onclick="openM()">+ Nouveau</button></div>
+          <table><thead><tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Plan</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="aUsers"></tbody></table>
+        </div>
+        <p style="font-size:.72rem;color:rgba(232,228,219,.2);margin-top:.5rem">Plans payants disponibles prochainement.</p>
+      </div>
+
+      <div class="panel" id="p-site">
+        <div class="pw">
+          <div class="pb">
+            <div class="pd" style="background:#e05c5c"></div>
+            <div class="pd" style="background:#e8c445"></div>
+            <div class="pd" style="background:#5aad7a"></div>
+            <div class="pu" id="sUrl">https://inkwell-auteurs.netlify.app</div>
+            <button class="abtn" onclick="window.open(document.getElementById('sUrl').textContent)">Ouvrir →</button>
+          </div>
+          <div class="pi2">
+            <div><div class="pil">Nom</div><div class="piv">Inkwell</div></div>
+            <div><div class="pil">Hébergeur</div><div class="piv">Netlify</div></div>
+            <div><div class="pil">Mise à jour</div><div class="piv" id="lUpd">—</div></div>
+            <div><div class="pil">Statut</div><div class="piv"><span class="pill po">En ligne</span></div></div>
+          </div>
+        </div>
+        <div class="scard">
+          <h3>Options</h3>
+          <div class="trow"><div><div class="tl">Mode maintenance</div><div class="ts">Page "En maintenance" pour les visiteurs</div></div><label class="sw"><input type="checkbox" id="t1" onchange="saveSite()"><span class="swt"></span></label></div>
+          <div class="trow"><div><div class="tl">Inscriptions ouvertes</div><div class="ts">Autoriser les nouvelles inscriptions</div></div><label class="sw"><input type="checkbox" id="t2" checked onchange="saveSite()"><span class="swt"></span></label></div>
+          <div class="trow"><div><div class="tl">Mode sombre par défaut</div><div class="ts">Pour les nouveaux visiteurs</div></div><label class="sw"><input type="checkbox" id="t3" onchange="saveSite()"><span class="swt"></span></label></div>
+        </div>
+      </div>
+
+      <div class="panel" id="p-pages">
+        <div class="tw">
+          <div class="th2"><h3>Pages Inkwell</h3></div>
+          <table><thead><tr><th>Page</th><th>Description</th><th>Statut</th><th>Visible</th></tr></thead><tbody id="pgBody"></tbody></table>
+        </div>
+      </div>
+
+      <div class="panel" id="p-stats">
+        <div class="srow">
+          <div class="sc"><div class="sc-n" id="sw">0</div><div class="sc-l">Mots écrits</div></div>
+          <div class="sc"><div class="sc-n" id="ss">0</div><div class="sc-l">Sessions</div></div>
+          <div class="sc"><div class="sc-n" id="sc2">0</div><div class="sc-l">Personnages</div></div>
+          <div class="sc"><div class="sc-n" id="sb2">0</div><div class="sc-l">Badges</div></div>
+        </div>
+        <div class="tw">
+          <div class="th2"><h3>Données sauvegardées</h3></div>
+          <table><thead><tr><th>Catégorie</th><th>Quantité</th><th>Taille</th></tr></thead><tbody id="dStats"></tbody></table>
+        </div>
+      </div>
+
+      <div class="panel" id="p-settings">
+        <div class="sgrid">
+          <div class="scard">
+            <h3>Mon compte</h3>
+            <div class="sg2"><label>Prénom</label><input type="text" id="sn" placeholder="Matteo"></div>
+            <div class="sg2"><label>Email</label><input type="email" id="se"></div>
+            <div class="sg2"><label>Nouveau mot de passe</label><input type="password" id="sp" placeholder="Laisser vide pour ne pas changer"></div>
+            <button class="sbtn" onclick="saveProf()" style="margin-top:.5rem">Sauvegarder</button>
+          </div>
+          <div class="scard">
+            <h3>Site</h3>
+            <div class="sg2"><label>Nom du site</label><input type="text" id="ssn" value="Inkwell"></div>
+            <div class="sg2"><label>URL Netlify</label><input type="text" id="ssu" value="https://inkwell-auteurs.netlify.app"></div>
+            <div class="sg2"><label>Description</label><input type="text" id="ssd" value="L'atelier des auteurs"></div>
+            <button class="sbtn" onclick="saveSiteInfo()" style="margin-top:.5rem">Sauvegarder</button>
+          </div>
+          <div class="scard">
+            <h3>Données</h3>
+            <p style="font-size:.78rem;color:rgba(232,228,219,.36);margin-bottom:1rem;line-height:1.7">Toutes les données sont stockées dans le navigateur (localStorage).</p>
+            <button class="sbtn sec" onclick="exportD()" style="display:block;width:100%;margin-bottom:.6rem">Exporter en JSON</button>
+            <label class="sbtn sec" style="display:block;width:100%;margin-bottom:.6rem;text-align:center;cursor:pointer">
+              Importer un fichier JSON
+              <input type="file" id="importFile" accept=".json" style="display:none" onchange="importD(this)">
+            </label>
+            <button class="sbtn red" onclick="if(confirm('Effacer toutes les données ?'))clearD()" style="display:block;width:100%">Effacer les données</button>
+          </div>
+          <div class="scard">
+            <h3>Sécurité</h3>
+            <p style="font-size:.78rem;color:rgba(232,228,219,.36);margin-bottom:1rem;line-height:1.7">Mots de passe encodés localement. Pour changer un mot de passe, modifiez l'utilisateur et recréez-le.</p>
+            <div class="trow"><div><div class="tl">Session persistante</div><div class="ts">Rester connecté après fermeture</div></div><label class="sw"><input type="checkbox" id="tPers" checked><span class="swt"></span></label></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="p-activity">
+        <div class="al" id="actLog"></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="mov" id="modal">
+  <div class="mbox">
+    <div class="mt">Ajouter un utilisateur<button class="mc" onclick="closeM()">×</button></div>
+    <div class="sg2"><label>Prénom</label><input type="text" id="mn" placeholder="Prénom"></div>
+    <div class="sg2"><label>Email</label><input type="email" id="me" placeholder="email@exemple.com"></div>
+    <div class="sg2"><label>Mot de passe</label><input type="password" id="mp" placeholder="Mot de passe"></div>
+    <div class="sg2"><label>Rôle</label>
+      <select id="mr"><option value="super_admin">Super Admin</option><option value="admin">Admin</option><option value="free" selected>Membre Gratuit</option><option value="premium">Membre Premium</option></select>
+    </div>
+    <div style="display:flex;gap:.8rem;margin-top:1.1rem">
+      <button class="sbtn" style="flex:1" onclick="addUser()">Créer →</button>
+      <button class="sbtn sec" onclick="closeM()">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const PAGES=[
+  {n:'Accueil',d:'Hero, mixeur sonore, stats perso'},
+  {n:'Écriture',d:'Timer + planificateur chapitres'},
+  {n:'Outils',d:'Répétitions, noms, style IA'},
+  {n:'Analyser',d:'Analyse texte + résumé IA'},
+  {n:'Continuer',d:'Suite, passé perso, dialogue, lieu'},
+  {n:'Univers',d:'Personnages, timeline, glossaire'},
+  {n:'Progression',d:'Badges, graphique, journal'},
+  {n:'Inspiration',d:'Générateurs d\'idées'},
+  {n:'Conseils',d:'Guide complet auteur'},
+];
+const RL={super_admin:'Super Admin',admin:'Admin',free:'Gratuit',premium:'Premium'};
+const RP={super_admin:'pa',admin:'pa',free:'pf',premium:'po'};
+const DU=[
+  {id:1,name:'Matteo',email:'matteodebruijne@gmail.com',pwd:btoa('150909Mmmm'),role:'super_admin',plan:'super_admin',active:true,created:'2026-03-26'},
+  {id:2,name:'Ben',email:'benspy@gmail.com',pwd:btoa('150909Mmmm'),role:'super_admin',plan:'super_admin',active:true,created:'2026-03-26'},
+];
+const PROTECTED=['matteodebruijne@gmail.com','benspy@gmail.com'];
+
+function getU(){return JSON.parse(localStorage.getItem('iw_users')||JSON.stringify(DU));}
+function saveU(u){localStorage.setItem('iw_users',JSON.stringify(u));showT('✓ Sauvegardé','ok');}
+function getA(){return JSON.parse(localStorage.getItem('iw_act')||'[]');}
+function log(msg,t=''){const a=getA();a.unshift({msg,t,time:new Date().toLocaleString('fr-FR')});localStorage.setItem('iw_act',JSON.stringify(a.slice(0,60)));}
+
+function login(){
+  const e=document.getElementById('lE').value.trim().toLowerCase();
+  const p=document.getElementById('lP').value;
+  const u=getU().find(x=>x.email.toLowerCase()===e&&x.pwd===btoa(p)&&x.active);
+  if(u){
+    localStorage.setItem('iw_ses',JSON.stringify({id:u.id,name:u.name,email:u.email,role:u.role}));
+    log('Connexion de '+u.name);loadAdmin(u);
+  } else {
+    const el=document.getElementById('lErr');el.classList.add('show');
+    setTimeout(()=>el.classList.remove('show'),3000);
+  }
+}
+function logout(){
+  localStorage.removeItem('iw_ses');log('Déconnexion');
+  document.getElementById('adminPage').style.display='none';
+  document.getElementById('loginPage').style.display='flex';
+  document.getElementById('lP').value='';
+}
+function loadAdmin(u){
+  document.getElementById('loginPage').style.display='none';
+  document.getElementById('adminPage').style.display='block';
+  document.getElementById('uNm').textContent=u.name;
+  document.getElementById('uAv').textContent=u.name.charAt(0).toUpperCase();
+  document.getElementById('tRole').textContent=u.role==='super_admin'?'Super Admin':'Admin';
+  document.getElementById('lUpd').textContent=new Date().toLocaleDateString('fr-FR');
+  document.getElementById('sn').value=u.name;
+  document.getElementById('se').value=u.email;
+  const url=localStorage.getItem('iw_url')||'https://inkwell-auteurs.netlify.app';
+  document.getElementById('sUrl').textContent=url;
+  document.getElementById('ssu').value=url;
+  renderDash();renderPages();
+  showT('Bienvenue, '+u.name+' !','ok');
+}
+function go(id,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sl').forEach(l=>l.classList.remove('active'));
+  document.getElementById('p-'+id).classList.add('active');el.classList.add('active');
+  const T={dash:'Tableau de bord',users:'Utilisateurs',site:'Gestion du site',pages:'Pages',stats:'Statistiques',settings:'Paramètres',activity:'Journal d\'activité'};
+  document.getElementById('pTitle').textContent=T[id]||id;
+  if(id==='stats')renderStats();
+  if(id==='activity')renderAct();
+  if(id==='users')renderAll();
+  if(window.innerWidth<768)document.getElementById('sb').classList.remove('open');
+}
+function pill(role,active){
+  const rp=RP[role]||'pf';
+  return `<span class="pill ${rp}">${RL[role]||role}</span>`;
+}
+function renderDash(){
+  const users=getU();
+  document.getElementById('s-u').textContent=users.length;
+  document.getElementById('dUsers').innerHTML=users.filter(u=>u.role==='super_admin'||u.role==='admin').map(u=>`
+    <tr><td>${u.name}</td><td style="color:rgba(232,228,219,.38)">${u.email}</td>
+    <td>${pill(u.role)}</td>
+    <td><span class="pill ${u.active?'po':'pi'}">${u.active?'Actif':'Inactif'}</span></td>
+    <td><button class="abtn" onclick="toggleU(${u.id})">${u.active?'Désactiver':'Activer'}</button></td></tr>`).join('');
+  const a=getA().slice(0,5);
+  document.getElementById('dAct').innerHTML=a.length?a.map(x=>`<div class="ai"><div class="ad ${x.t}"></div><div><div class="at">${x.msg}</div><div class="atime">${x.time}</div></div></div>`).join('')
+    :'<div class="ai"><div class="at" style="color:rgba(232,228,219,.22)">Aucune activité récente.</div></div>';
+}
+function renderAll(){
+  document.getElementById('aUsers').innerHTML=getU().map(u=>`
+    <tr><td>${u.name}</td><td style="color:rgba(232,228,219,.38)">${u.email}</td>
+    <td>${pill(u.role)}</td>
+    <td><span class="pill pf">${u.plan==='super_admin'?'Super Admin':u.plan==='premium'?'Premium':'Gratuit'}</span></td>
+    <td><span class="pill ${u.active?'po':'pi'}">${u.active?'Actif':'Inactif'}</span></td>
+    <td style="display:flex;gap:.4rem">
+      <button class="abtn" onclick="toggleU(${u.id})">${u.active?'Désactiver':'Activer'}</button>
+      ${!PROTECTED.includes(u.email)?`<button class="abtn d" onclick="delU(${u.id})">Suppr.</button>`:''}
+    </td></tr>`).join('');
+}
+function renderPages(){
+  document.getElementById('pgBody').innerHTML=PAGES.map(p=>`
+    <tr><td>${p.n}</td><td style="color:rgba(232,228,219,.38)">${p.d}</td>
+    <td><span class="pill po">Active</span></td>
+    <td><label class="sw" style="margin:0"><input type="checkbox" checked><span class="swt"></span></label></td></tr>`).join('');
+}
+function renderStats(){
+  const j=JSON.parse(localStorage.getItem('inkwell_journal')||'[]');
+  const chars=JSON.parse(localStorage.getItem('inkwell_chars')||'[]');
+  const badges=JSON.parse(localStorage.getItem('inkwell_badges')||'[]');
+  document.getElementById('sw').textContent=j.reduce((s,e)=>s+(e.words||0),0).toLocaleString();
+  document.getElementById('ss').textContent=j.length;
+  document.getElementById('sc2').textContent=chars.length;
+  document.getElementById('sb2').textContent=badges.length;
+  const rows=[
+    ['Journal d\'écriture',j.length+' entrées','inkwell_journal'],
+    ['Personnages',chars.length+' fiches','inkwell_chars'],
+    ['Chapitres',JSON.parse(localStorage.getItem('inkwell_chapters')||'[]').length+' ch.','inkwell_chapters'],
+    ['Timeline',JSON.parse(localStorage.getItem('inkwell_timeline')||'[]').length+' événements','inkwell_timeline'],
+    ['Continuité',JSON.parse(localStorage.getItem('inkwell_cont')||'[]').length+' notes','inkwell_cont'],
+    ['Glossaire',JSON.parse(localStorage.getItem('inkwell_gloss')||'[]').length+' termes','inkwell_gloss'],
+  ];
+  document.getElementById('dStats').innerHTML=rows.map(r=>{
+    const v=localStorage.getItem(r[2])||'';const b=new Blob([v]).size;
+    const sz=b<1024?b+'o':Math.round(b/1024*10)/10+'ko';
+    return `<tr><td>${r[0]}</td><td style="color:rgba(232,228,219,.38)">${r[1]}</td><td style="color:rgba(232,228,219,.22)">${sz}</td></tr>`;
+  }).join('');
+}
+function renderAct(){
+  const a=getA();
+  document.getElementById('actLog').innerHTML=a.length?a.map(x=>`<div class="ai"><div class="ad ${x.t}"></div><div><div class="at">${x.msg}</div><div class="atime">${x.time}</div></div></div>`).join('')
+    :'<div class="ai"><div class="at" style="color:rgba(232,228,219,.22)">Aucune activité enregistrée.</div></div>';
+}
+function toggleU(id){
+  const users=getU();const u=users.find(x=>x.id===id);if(!u)return;
+  u.active=!u.active;saveU(users);log((u.active?'Activation':'Désactivation')+' de '+u.name,'w');
+  renderDash();if(document.getElementById('aUsers').innerHTML)renderAll();
+  showT(u.name+' '+(u.active?'activé':'désactivé'));
+}
+function delU(id){
+  if(!confirm('Supprimer cet utilisateur ?'))return;
+  const users=getU().filter(u=>u.id!==id);saveU(users);
+  log('Suppression d\'un utilisateur','d');renderDash();renderAll();showT('Supprimé','ok');
+}
+function openM(){document.getElementById('modal').classList.add('open');}
+function closeM(){document.getElementById('modal').classList.remove('open');}
+function addUser(){
+  const n=document.getElementById('mn').value.trim();
+  const e=document.getElementById('me').value.trim();
+  const p=document.getElementById('mp').value;
+  const r=document.getElementById('mr').value;
+  if(!n||!e||!p){showT('Remplis tous les champs','err');return;}
+  const users=getU();
+  if(users.find(u=>u.email.toLowerCase()===e.toLowerCase())){showT('Email déjà utilisé','err');return;}
+  users.push({id:Date.now(),name:n,email:e,pwd:btoa(p),role:r,plan:['super_admin','admin'].includes(r)?r:'free',active:true,created:new Date().toISOString().slice(0,10)});
+  saveU(users);log('Ajout de '+n+' ('+RL[r]+')');renderDash();closeM();
+  ['mn','me','mp'].forEach(id=>document.getElementById(id).value='');
+  showT(n+' ajouté !','ok');
+}
+function saveSite(){log('Options site modifiées');}
+function saveProf(){
+  const n=document.getElementById('sn').value.trim();
+  if(n){document.getElementById('uNm').textContent=n;localStorage.setItem('inkwell_name',n);}
+  log('Profil mis à jour');showT('Profil sauvegardé','ok');
+}
+function saveSiteInfo(){
+  const url=document.getElementById('ssu').value.trim();
+  localStorage.setItem('iw_url',url);document.getElementById('sUrl').textContent=url;
+  log('URL modifiée');showT('Infos sauvegardées','ok');
+}
+function importD(input){
+  const file=input.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const data=JSON.parse(e.target.result);
+      const keys=['inkwell_journal','inkwell_chars','inkwell_chapters','inkwell_timeline','inkwell_cont','inkwell_gloss','inkwell_badges','inkwell_ms_titre','inkwell_ms_texte'];
+      let imported=0;
+      keys.forEach(k=>{
+        if(data[k]!==undefined&&data[k]!==null){
+          localStorage.setItem(k,data[k]);
+          imported++;
+        }
+      });
+      log('Import de données ('+imported+' catégories)','info');
+      renderStats();
+      showT('✓ '+imported+' catégories importées !','ok');
+    }catch(err){
+      showT('Fichier invalide — vérifie que c\'est bien un export Inkwell.','err');
+    }
+    input.value='';
+  };
+  reader.readAsText(file);
+}
+function exportD(){
+  const keys=['inkwell_journal','inkwell_chars','inkwell_chapters','inkwell_timeline','inkwell_cont','inkwell_gloss','inkwell_badges','inkwell_ms_titre','inkwell_ms_texte'];
+  const d={};keys.forEach(k=>d[k]=localStorage.getItem(k));
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));
+  a.download='inkwell-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();
+  log('Export données');showT('Export téléchargé','ok');
+}
+function clearD(){
+  ['inkwell_journal','inkwell_chars','inkwell_chapters','inkwell_timeline','inkwell_cont','inkwell_gloss','inkwell_badges'].forEach(k=>localStorage.removeItem(k));
+  log('Données effacées','d');showT('Données effacées','ok');renderStats();
+}
+function showT(msg,type=''){
+  const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+(type||'');
+  t.classList.add('show');clearTimeout(window._tt);window._tt=setTimeout(()=>t.classList.remove('show'),2500);
+}
+(function init(){
+  const s=localStorage.getItem('iw_ses');
+  if(s){try{const u=JSON.parse(s);const f=getU().find(x=>x.id===u.id&&x.active);if(f){loadAdmin(f);return;}}catch(e){}}
+  document.getElementById('loginPage').style.display='flex';
+})();
+</script>
+</body>
+</html>
